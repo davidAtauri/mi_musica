@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:preferences/preferences.dart';
 
 const host="http://192.168.1.55/musica";
 var ms ;
@@ -12,26 +13,29 @@ double duracion = 10;
 double current = 0;
 
 
-
 //-------------------------------------------------------
 
-void main(){
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  audioPlayer = AudioPlayer();
-  makeGet();
-  print("lanzar app");
 
+  audioPlayer = AudioPlayer();
+
+  await PrefService.init(prefix: 'pref_');
+  runApp(Ppal());
 }
 
 
 
 // RECUPERA EL JSON DEL SERVIDOR -----------------------------------------------
 
-makeGet() async {
+Future<List<dynamic>> makeGet(url) async {
 
   print("lanzar la consuta");
   // make GET request
-  String url = 'http://puturrudefua.es/musica/MUSICA.JSON';
+  url = url+'/MUSICA.JSON';
+
+  print(url);
+
   http.Response response = await http.get(url);
   // sample info available in response
   int statusCode = response.statusCode;
@@ -45,10 +49,95 @@ makeGet() async {
   ms = caca['hijos'];
 
   todo = ms;
-  runApp(MyApp() );
+  //runApp(MyApp() );
+
+  return ms;
 
 }
 
+class Ppal extends StatelessWidget {
+
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Mi Música",
+      home: Setup(),
+    );
+  }
+}
+
+class Setup extends StatelessWidget{
+  var _c;
+  var _u;
+
+  void empezar() {
+    print("empezar");
+    makeGet(_u).then((_) {
+      print("REady !!!");
+      Navigator.push(
+        _c,
+        MaterialPageRoute(builder: (context) => MyApp()),
+      );
+    }
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Setup'),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(50),
+        child: Column(
+          children: <Widget>[
+            new FlatButton(
+              onPressed: () =>_u = "http://192.168.1.55/musica",
+              child: new Text("Raspi")
+              ),
+
+            new FlatButton(
+                onPressed: () =>_u = "http://puturrudefua.es/musica",
+                child: new Text("Puturrudefua.es")
+            ),
+
+
+
+          ],
+        )
+        /*
+        PreferencePage([
+          PreferenceTitle('Servidor'),
+
+          RadioPreference(
+            'Raspi',
+            'http://192.168.1.55/musica',
+            'servidor',
+            isDefault: true,
+          ),
+          RadioPreference(
+            'Remoto',
+            'http://puturrudefua.es/musica',
+            'servidor',
+          ),
+        ]),*/
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+            empezar();
+            _c = context;
+          },
+        tooltip: 'Increment Counter',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+}
 //---------------------------------------------------------------
 
 class MyApp extends StatefulWidget {

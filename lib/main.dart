@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:preferences/preferences.dart';
 
-const host="http://192.168.1.55/musica";
+const host="http://agrobotix.local/musica";
+
 var ms ;
 var todo;
 AudioPlayer audioPlayer = null;
@@ -37,20 +38,19 @@ Future<List<dynamic>> makeGet(url) async {
   print(url);
 
   http.Response response = await http.get(url);
-  // sample info available in response
+
   int statusCode = response.statusCode;
   Map<String, String> headers = response.headers;
   String contentType = headers['content-type'];
   String js = response.body;
   print(js);
-  // TODO convert json to object...
+
+  // json to object...
   var caca = json.decode(js);
   print(caca['hijos']);
   ms = caca['hijos'];
 
   todo = ms;
-  //runApp(MyApp() );
-
   return ms;
 
 }
@@ -95,7 +95,7 @@ class Setup extends StatelessWidget{
         child: Column(
           children: <Widget>[
             new FlatButton(
-              onPressed: () =>_u = "http://192.168.1.55/musica",
+              onPressed: () =>_u = "http://agrobotix.home/musica",
               child: new Text("Raspi")
               ),
 
@@ -104,26 +104,9 @@ class Setup extends StatelessWidget{
                 child: new Text("Puturrudefua.es")
             ),
 
-
-
           ],
         )
-        /*
-        PreferencePage([
-          PreferenceTitle('Servidor'),
 
-          RadioPreference(
-            'Raspi',
-            'http://192.168.1.55/musica',
-            'servidor',
-            isDefault: true,
-          ),
-          RadioPreference(
-            'Remoto',
-            'http://puturrudefua.es/musica',
-            'servidor',
-          ),
-        ]),*/
       ),
 
       floatingActionButton: FloatingActionButton(
